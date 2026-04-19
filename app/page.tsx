@@ -52,25 +52,57 @@ const communityTypes = [
   "Other",
 ];
 
+type FormDataState = Record<string, string | string[]>;
+
+const initialFormData: FormDataState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  organizationName: "",
+  instagram: "",
+  tiktok: "",
+  website: "",
+  referralSource: "",
+  usesWhatsApp: "",
+  businessType: "",
+  offerings: "",
+  totalFollowing: "",
+  primaryLink: "",
+  brandEmoji: "",
+  marketingBudget: "",
+  staffCount: "",
+  logoAssets: "",
+  contentAssets: "",
+  city: "",
+  state: "",
+  capacity: "",
+  indoorOutdoor: "",
+  venueDetails: "",
+  classTypes: [],
+  setTypes: "",
+  mixesLink: "",
+  hostType: "",
+  contentType: "",
+  promotionStyle: "",
+  communityType: "",
+  audienceSize: "",
+  eventFrequency: "",
+  creativeType: "",
+  portfolioLink: "",
+  agencyType: "",
+  represented: "",
+  partnershipType: "",
+  notes: "",
+};
+
 export default function Home() {
   const [partnerType, setPartnerType] = useState<PartnerType | "">("");
-  const [formData, setFormData] = useState<Record<string, string | string[]>>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    organizationName: "",
-    instagram: "",
-    tiktok: "",
-    website: "",
-    referralSource: "",
-    usesWhatsApp: "",
-  });
+  const [formData, setFormData] = useState<FormDataState>(initialFormData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
 
-  const handleChange = (
-    key: string,
-    value: string | string[]
-  ) => {
+  const handleChange = (key: string, value: string | string[]) => {
     setFormData((prev) => ({
       ...prev,
       [key]: value,
@@ -82,6 +114,7 @@ export default function Home() {
     const next = current.includes(value)
       ? current.filter((item) => item !== value)
       : [...current, value];
+
     handleChange(key, next);
   };
 
@@ -237,7 +270,37 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Form UI is live. Next we’ll connect Airtable.");
+    setIsSubmitting(true);
+    setSubmitMessage("");
+
+    try {
+      const payload = {
+        ...formData,
+        partnerType,
+      };
+
+      const response = await fetch("/api/forms/partners", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.error || "Submission failed");
+      }
+
+      setSubmitMessage("Thanks — your submission was received.");
+      setFormData(initialFormData);
+      setPartnerType("");
+    } catch {
+      setSubmitMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -314,12 +377,19 @@ export default function Home() {
             </section>
           )}
 
-          <button
-            type="submit"
-            className="w-full rounded-2xl bg-cyan-400 px-5 py-4 text-base font-semibold text-black transition hover:bg-cyan-300"
-          >
-            Submit
-          </button>
+          <div className="space-y-3">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full rounded-2xl bg-cyan-400 px-5 py-4 text-base font-semibold text-black transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </button>
+
+            {submitMessage ? (
+              <p className="text-sm text-neutral-300">{submitMessage}</p>
+            ) : null}
+          </div>
         </form>
       </div>
     </main>
