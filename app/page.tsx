@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+const LOGO_URL =
+  "https://cdn.shopify.com/s/files/1/0894/0188/4975/files/PupsNChillFullLogoTransparentBG.png";
+
 const ROLE_OPTIONS = [
   { value: "Sponsor / Vendor", emoji: "🤝", label: "Sponsor / Vendor" },
   { value: "Venue", emoji: "📍", label: "Venue" },
@@ -62,8 +65,6 @@ const EMPTY: FormData = {
 };
 
 const STEPS = ["Your Role", "Contact Info", "Online Presence", "Event Details"];
-
-// ─── primitives ──────────────────────────────────────────────────────────────
 
 const inputCls =
   "w-full rounded-2xl border border-[#5BC8F5]/40 bg-white px-4 py-3 text-[#1a2744] " +
@@ -176,8 +177,6 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
   );
 }
 
-// ─── main ────────────────────────────────────────────────────────────────────
-
 export default function Page() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(EMPTY);
@@ -190,7 +189,7 @@ export default function Page() {
     setForm((p) => ({ ...p, [field]: value }));
 
   const toggle = (field: keyof FormData, value: string) =>
-    setForm((p: any) => {
+    setForm((p) => {
       const cur = p[field] as string[];
       return {
         ...p,
@@ -207,11 +206,13 @@ export default function Page() {
       return n;
     });
 
+  function scrollTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function validateStep(s: number): boolean {
     const e: Record<string, string> = {};
-
     if (s === 1 && !form.partnerType) e.partnerType = "Please select your role.";
-
     if (s === 2) {
       if (!form.firstName.trim()) e.firstName = "Required";
       if (!form.lastName.trim()) e.lastName = "Required";
@@ -222,21 +223,24 @@ export default function Page() {
       if (!form.usesWhatsApp) e.usesWhatsApp = "Required";
       if (!form.referralSource.trim()) e.referralSource = "Required";
     }
-
     if (s === 3) {
       if (!form.instagram.trim()) e.instagram = "Required";
       if (!form.website.trim()) e.website = "Required";
     }
-
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
   function next() {
-    if (validateStep(step)) setStep((s) => Math.min(s + 1, STEPS.length));
+    if (validateStep(step)) {
+      setStep((s) => Math.min(s + 1, STEPS.length));
+      scrollTop();
+    }
   }
+
   function back() {
     setStep((s) => Math.max(s - 1, 1));
+    scrollTop();
   }
 
   async function submit() {
@@ -252,12 +256,11 @@ export default function Page() {
       const data = await res.json();
       if (!res.ok) {
         setServerError(
-          typeof data.error === "string"
-            ? data.error
-            : JSON.stringify(data.error)
+          typeof data.error === "string" ? data.error : JSON.stringify(data.error)
         );
       } else {
         setSubmitted(true);
+        scrollTop();
       }
     } catch {
       setServerError("Something went wrong. Please try again.");
@@ -269,30 +272,49 @@ export default function Page() {
   const isSponsor = SPONSOR_ROLES.has(form.partnerType);
   const hasSocial = SOCIAL_ROLES.has(form.partnerType);
 
-  // ── success ──
+  // ── Success screen ──
   if (submitted) {
     return (
       <main
-        className="min-h-screen flex items-center justify-center px-6"
+        className="min-h-screen flex flex-col items-center justify-center px-6 py-16 text-center"
         style={{ background: "linear-gradient(160deg, #e8f7fd 0%, #f5ede0 100%)" }}
       >
-        <div className="text-center max-w-md">
+        <img
+          src={LOGO_URL}
+          alt="Pups N Chill"
+          className="h-28 w-auto mb-8 object-contain"
+        />
+        <div
+          className="rounded-3xl px-8 py-10 max-w-md w-full"
+          style={{
+            background: "rgba(255,255,255,0.80)",
+            border: "1px solid rgba(91,200,245,0.25)",
+            backdropFilter: "blur(16px)",
+            boxShadow: "0 8px 40px rgba(14,123,181,0.10)",
+          }}
+        >
           <div
-            className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full text-4xl"
+            className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full text-3xl"
             style={{ background: "linear-gradient(135deg, #0e7bb5, #5BC8F5)" }}
           >
             🫶
           </div>
           <h1
-            className="mb-3 text-3xl font-black text-[#1a2744]"
+            className="mb-3 text-2xl font-black text-[#1a2744]"
             style={{ fontFamily: "'Nunito', sans-serif" }}
           >
             Application Received!
           </h1>
-          <p className="text-[#1a2744]/60 leading-relaxed">
+          <p className="text-[#1a2744]/60 leading-relaxed text-sm font-semibold">
             Thanks for applying to partner with Pups N Chill. We review every
             application within 48 hours — keep an eye on your inbox. 🐶
           </p>
+          <div
+            className="mt-6 rounded-2xl px-4 py-3 text-xs font-bold text-[#0e7bb5]"
+            style={{ background: "rgba(91,200,245,0.1)" }}
+          >
+            pupsnchill.com · @pupsnchillmiami
+          </div>
         </div>
       </main>
     );
@@ -304,13 +326,12 @@ export default function Page() {
       style={{ background: "linear-gradient(160deg, #e8f7fd 0%, #f5ede0 100%)" }}
     >
       {/* Header */}
-      <div className="px-6 pt-12 pb-6 text-center">
-        <p
-          className="mb-1 text-xs font-black uppercase tracking-[0.25em]"
-          style={{ color: "#0e7bb5" }}
-        >
-          Pups N Chill
-        </p>
+      <div className="px-6 pt-10 pb-6 text-center">
+        <img
+          src={LOGO_URL}
+          alt="Pups N Chill"
+          className="mx-auto h-24 w-auto object-contain mb-4"
+        />
         <h1
           className="text-3xl font-black text-[#1a2744] sm:text-4xl"
           style={{ fontFamily: "'Nunito', sans-serif" }}
@@ -352,10 +373,7 @@ export default function Page() {
               <ChipSelect
                 options={ROLE_OPTIONS}
                 value={form.partnerType}
-                onSelect={(v) => {
-                  set("partnerType", v);
-                  clearErr("partnerType");
-                }}
+                onSelect={(v) => { set("partnerType", v); clearErr("partnerType"); }}
               />
               {errors.partnerType && (
                 <p className="text-sm text-red-500 font-semibold">{errors.partnerType}</p>
@@ -367,128 +385,64 @@ export default function Page() {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <h2
-                  className="mb-1 text-xl font-black text-[#1a2744]"
-                  style={{ fontFamily: "'Nunito', sans-serif" }}
-                >
+                <h2 className="mb-1 text-xl font-black text-[#1a2744]" style={{ fontFamily: "'Nunito', sans-serif" }}>
                   Contact Info
                 </h2>
-                <p className="text-sm text-[#1a2744]/40 font-semibold">
-                  How we'll reach you to confirm your spot.
-                </p>
+                <p className="text-sm text-[#1a2744]/40 font-semibold">How we'll reach you to confirm your spot.</p>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <Field label="First Name" required>
-                    <input
-                      className={inputCls}
-                      value={form.firstName}
-                      onChange={(e) => {
-                        set("firstName", e.target.value);
-                        clearErr("firstName");
-                      }}
-                    />
+                    <input className={inputCls} value={form.firstName}
+                      onChange={(e) => { set("firstName", e.target.value); clearErr("firstName"); }} />
                   </Field>
-                  {errors.firstName && (
-                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.firstName}</p>
-                  )}
+                  {errors.firstName && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.firstName}</p>}
                 </div>
                 <div>
                   <Field label="Last Name" required>
-                    <input
-                      className={inputCls}
-                      value={form.lastName}
-                      onChange={(e) => {
-                        set("lastName", e.target.value);
-                        clearErr("lastName");
-                      }}
-                    />
+                    <input className={inputCls} value={form.lastName}
+                      onChange={(e) => { set("lastName", e.target.value); clearErr("lastName"); }} />
                   </Field>
-                  {errors.lastName && (
-                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.lastName}</p>
-                  )}
+                  {errors.lastName && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.lastName}</p>}
                 </div>
                 <div>
                   <Field label="Email" required>
-                    <input
-                      type="email"
-                      className={inputCls}
-                      value={form.email}
-                      onChange={(e) => {
-                        set("email", e.target.value);
-                        clearErr("email");
-                      }}
-                    />
+                    <input type="email" className={inputCls} value={form.email}
+                      onChange={(e) => { set("email", e.target.value); clearErr("email"); }} />
                   </Field>
-                  {errors.email && (
-                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.email}</p>
-                  )}
+                  {errors.email && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.email}</p>}
                 </div>
                 <div>
                   <Field label="Phone" required>
-                    <input
-                      type="tel"
-                      className={inputCls}
-                      value={form.phone}
-                      onChange={(e) => {
-                        set("phone", e.target.value);
-                        clearErr("phone");
-                      }}
-                    />
+                    <input type="tel" className={inputCls} value={form.phone}
+                      onChange={(e) => { set("phone", e.target.value); clearErr("phone"); }} />
                   </Field>
-                  {errors.phone && (
-                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.phone}</p>
-                  )}
+                  {errors.phone && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.phone}</p>}
                 </div>
                 <div className="sm:col-span-2">
                   <Field label="Company / Brand / Organization" required>
-                    <input
-                      className={inputCls}
-                      value={form.organizationName}
-                      onChange={(e) => {
-                        set("organizationName", e.target.value);
-                        clearErr("organizationName");
-                      }}
-                    />
+                    <input className={inputCls} value={form.organizationName}
+                      onChange={(e) => { set("organizationName", e.target.value); clearErr("organizationName"); }} />
                   </Field>
-                  {errors.organizationName && (
-                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.organizationName}</p>
-                  )}
+                  {errors.organizationName && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.organizationName}</p>}
                 </div>
                 <div>
                   <Field label="Do you use WhatsApp regularly?" required>
-                    <select
-                      className={inputCls}
-                      value={form.usesWhatsApp}
-                      onChange={(e) => {
-                        set("usesWhatsApp", e.target.value);
-                        clearErr("usesWhatsApp");
-                      }}
-                    >
+                    <select className={inputCls} value={form.usesWhatsApp}
+                      onChange={(e) => { set("usesWhatsApp", e.target.value); clearErr("usesWhatsApp"); }}>
                       <option value="">Select</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
                   </Field>
-                  {errors.usesWhatsApp && (
-                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.usesWhatsApp}</p>
-                  )}
+                  {errors.usesWhatsApp && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.usesWhatsApp}</p>}
                 </div>
                 <div>
                   <Field label="Who referred you?" required>
-                    <input
-                      className={inputCls}
-                      placeholder="Name or promo code"
-                      value={form.referralSource}
-                      onChange={(e) => {
-                        set("referralSource", e.target.value);
-                        clearErr("referralSource");
-                      }}
-                    />
+                    <input className={inputCls} placeholder="Name or promo code" value={form.referralSource}
+                      onChange={(e) => { set("referralSource", e.target.value); clearErr("referralSource"); }} />
                   </Field>
-                  {errors.referralSource && (
-                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.referralSource}</p>
-                  )}
+                  {errors.referralSource && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.referralSource}</p>}
                 </div>
               </div>
             </div>
@@ -498,87 +452,45 @@ export default function Page() {
           {step === 3 && (
             <div className="space-y-4">
               <div>
-                <h2
-                  className="mb-1 text-xl font-black text-[#1a2744]"
-                  style={{ fontFamily: "'Nunito', sans-serif" }}
-                >
+                <h2 className="mb-1 text-xl font-black text-[#1a2744]" style={{ fontFamily: "'Nunito', sans-serif" }}>
                   Your Brand Online
                 </h2>
-                <p className="text-sm text-[#1a2744]/40 font-semibold">
-                  Help us feature you across our channels the right way.
-                </p>
+                <p className="text-sm text-[#1a2744]/40 font-semibold">Help us feature you across our channels the right way.</p>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <Field label="Instagram Handle" required>
-                    <input
-                      className={inputCls}
-                      placeholder="@yourbrand"
-                      value={form.instagram}
-                      onChange={(e) => {
-                        set("instagram", e.target.value);
-                        clearErr("instagram");
-                      }}
-                    />
+                    <input className={inputCls} placeholder="@yourbrand" value={form.instagram}
+                      onChange={(e) => { set("instagram", e.target.value); clearErr("instagram"); }} />
                   </Field>
-                  {errors.instagram && (
-                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.instagram}</p>
-                  )}
+                  {errors.instagram && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.instagram}</p>}
                 </div>
                 <Field label="TikTok Handle">
-                  <input
-                    className={inputCls}
-                    placeholder="@yourtiktok"
-                    value={form.tiktok}
-                    onChange={(e) => set("tiktok", e.target.value)}
-                  />
+                  <input className={inputCls} placeholder="@yourtiktok" value={form.tiktok}
+                    onChange={(e) => set("tiktok", e.target.value)} />
                 </Field>
                 <div className="sm:col-span-2">
                   <Field label="Website" required>
-                    <input
-                      type="url"
-                      className={inputCls}
-                      placeholder="https://yourbrand.com"
-                      value={form.website}
-                      onChange={(e) => {
-                        set("website", e.target.value);
-                        clearErr("website");
-                      }}
-                    />
+                    <input type="url" className={inputCls} placeholder="https://yourbrand.com" value={form.website}
+                      onChange={(e) => { set("website", e.target.value); clearErr("website"); }} />
                   </Field>
-                  {errors.website && (
-                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.website}</p>
-                  )}
+                  {errors.website && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.website}</p>}
                 </div>
                 {hasSocial && (
                   <>
                     <Field label="Total Combined Following">
-                      <input
-                        className={inputCls}
-                        placeholder="e.g. 12,500"
-                        value={form.totalFollowing}
-                        onChange={(e) => set("totalFollowing", e.target.value)}
-                      />
+                      <input className={inputCls} placeholder="e.g. 12,500" value={form.totalFollowing}
+                        onChange={(e) => set("totalFollowing", e.target.value)} />
                     </Field>
                     <Field label="Primary Link to Feature">
-                      <input
-                        type="url"
-                        className={inputCls}
-                        placeholder="IG, website, Linktree…"
-                        value={form.primaryLink}
-                        onChange={(e) => set("primaryLink", e.target.value)}
-                      />
+                      <input type="url" className={inputCls} placeholder="IG, website, Linktree…" value={form.primaryLink}
+                        onChange={(e) => set("primaryLink", e.target.value)} />
                     </Field>
                   </>
                 )}
                 <Field label="Best Emoji for Your Brand">
-                  <input
-                    className={inputCls}
-                    placeholder="🔥"
-                    style={{ fontSize: 22 }}
-                    value={form.brandEmoji}
-                    onChange={(e) => set("brandEmoji", e.target.value)}
-                  />
+                  <input className={inputCls} placeholder="🔥" style={{ fontSize: 22 }} value={form.brandEmoji}
+                    onChange={(e) => set("brandEmoji", e.target.value)} />
                 </Field>
               </div>
             </div>
@@ -588,74 +500,43 @@ export default function Page() {
           {step === 4 && (
             <div className="space-y-5">
               <div>
-                <h2
-                  className="mb-1 text-xl font-black text-[#1a2744]"
-                  style={{ fontFamily: "'Nunito', sans-serif" }}
-                >
+                <h2 className="mb-1 text-xl font-black text-[#1a2744]" style={{ fontFamily: "'Nunito', sans-serif" }}>
                   Event Details
                 </h2>
-                <p className="text-sm text-[#1a2744]/40 font-semibold">
-                  Almost done — a few final details so we can plan around you.
-                </p>
+                <p className="text-sm text-[#1a2744]/40 font-semibold">Almost done — a few final details so we can plan around you.</p>
               </div>
-
               {isSponsor && (
                 <>
                   <Field label="What category best describes your business?">
                     <div className="mt-2">
-                      <MultiChip
-                        options={BUSINESS_TYPES}
-                        selected={form.businessType}
-                        onToggle={(v) => toggle("businessType", v)}
-                      />
+                      <MultiChip options={BUSINESS_TYPES} selected={form.businessType}
+                        onToggle={(v) => toggle("businessType", v)} />
                     </div>
                   </Field>
                   <Field label="Monthly Marketing Budget">
-                    <select
-                      className={inputCls}
-                      value={form.marketingBudget}
-                      onChange={(e) => set("marketingBudget", e.target.value)}
-                    >
+                    <select className={inputCls} value={form.marketingBudget}
+                      onChange={(e) => set("marketingBudget", e.target.value)}>
                       <option value="">Select a range</option>
-                      {BUDGET_OPTIONS.map((o) => (
-                        <option key={o} value={o}>
-                          {o}
-                        </option>
-                      ))}
+                      {BUDGET_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
                     </select>
                   </Field>
                 </>
               )}
-
               <Field label="Products / services you're offering at the event">
-                <textarea
-                  className={inputCls}
-                  rows={3}
+                <textarea className={inputCls} rows={3}
                   placeholder="Describe what you'll bring or provide…"
                   value={form.offerings}
-                  onChange={(e) => set("offerings", e.target.value)}
-                />
+                  onChange={(e) => set("offerings", e.target.value)} />
               </Field>
-
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="Logo Assets (link)">
-                  <input
-                    type="url"
-                    className={inputCls}
-                    placeholder="Drive / Dropbox link"
-                    value={form.logoAssets}
-                    onChange={(e) => set("logoAssets", e.target.value)}
-                  />
+                  <input type="url" className={inputCls} placeholder="Drive / Dropbox link" value={form.logoAssets}
+                    onChange={(e) => set("logoAssets", e.target.value)} />
                 </Field>
                 <div className="sm:col-span-2">
                   <Field label="Content We Can Use (link)">
-                    <input
-                      type="url"
-                      className={inputCls}
-                      placeholder="Photos, videos, etc."
-                      value={form.contentAssets}
-                      onChange={(e) => set("contentAssets", e.target.value)}
-                    />
+                    <input type="url" className={inputCls} placeholder="Photos, videos, etc." value={form.contentAssets}
+                      onChange={(e) => set("contentAssets", e.target.value)} />
                   </Field>
                 </div>
               </div>
@@ -665,32 +546,32 @@ export default function Page() {
           {/* ── Nav ── */}
           <div className="mt-8 flex gap-3">
             {step > 1 && (
-              <button
-                type="button"
-                onClick={back}
-                className="rounded-2xl border border-[#5BC8F5]/30 bg-white px-5 py-3 text-sm font-bold text-[#1a2744]/60 transition hover:border-[#5BC8F5] hover:text-[#0e7bb5]"
-              >
+              <button type="button" onClick={back}
+                className="rounded-2xl border border-[#5BC8F5]/30 bg-white px-5 py-3 text-sm font-bold text-[#1a2744]/60 transition hover:border-[#5BC8F5] hover:text-[#0e7bb5]">
                 ← Back
               </button>
             )}
             {step < STEPS.length ? (
-              <button
-                type="button"
-                onClick={next}
+              <button type="button" onClick={next}
                 className="flex-1 rounded-2xl py-3 text-base font-black text-white transition hover:opacity-90 active:scale-[0.98]"
-                style={{ background: "linear-gradient(135deg, #0e7bb5, #5BC8F5)" }}
-              >
+                style={{ background: "linear-gradient(135deg, #0e7bb5, #5BC8F5)" }}>
                 Continue →
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={submit}
-                disabled={submitting}
-                className="flex-1 rounded-2xl py-3 text-base font-black text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
-                style={{ background: "linear-gradient(135deg, #a0622a, #C8955A)" }}
-              >
-                {submitting ? "Submitting…" : "Submit Application 🫶"}
+              <button type="button" onClick={submit} disabled={submitting}
+                className="flex-1 rounded-2xl py-3 text-base font-black text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
+                style={{ background: "linear-gradient(135deg, #a0622a, #C8955A)" }}>
+                {submitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                    Submitting…
+                  </>
+                ) : (
+                  "Submit Application 🫶"
+                )}
               </button>
             )}
           </div>
