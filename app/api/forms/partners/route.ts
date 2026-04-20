@@ -20,6 +20,12 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
 
+    // Log exactly what we're hitting so you can verify in Vercel function logs
+    console.log("Airtable target:", {
+      baseId: AIRTABLE_BASE_ID,
+      table: AIRTABLE_SPONSOR_TABLE,
+    });
+
     const fields: Record<string, any> = {
       "First Name": data.firstName || "",
       "Last Name": data.lastName || "",
@@ -45,7 +51,6 @@ export async function POST(req: Request) {
     if (data.primaryLink) fields["Primary Link"] = data.primaryLink;
     if (data.brandEmoji) fields["Brand Emoji"] = data.brandEmoji;
     if (data.marketingBudget) fields["Marketing Budget"] = data.marketingBudget;
-    if (data.staffCount) fields["Staff Count"] = String(data.staffCount);
     if (data.logoAssets) fields["Logo Assets"] = data.logoAssets;
     if (data.contentAssets) fields["Content Assets"] = data.contentAssets;
 
@@ -66,7 +71,7 @@ export async function POST(req: Request) {
     const json = await res.json();
 
     if (!res.ok) {
-      console.error("Airtable error response:", json);
+      console.error("Airtable error response:", JSON.stringify(json));
       return NextResponse.json({ error: json }, { status: 500 });
     }
 
