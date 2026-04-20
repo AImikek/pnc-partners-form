@@ -668,3 +668,40 @@ export default function Page() {
               <button
                 type="button"
                 onClick={back}
+                className="rounded-2xl border border-[#5BC8F5]/30 bg-white px-5 py-3 text-sm font-bold text-[#1a2744]/60 transition hover:border-[#5BC8F5] hover:text-[#0e7bb5]"
+              >
+                ← Back
+              </button>
+            )}
+            {step < STEPS.length ? (
+              <button
+                type="button"
+                onClick={next}
+                className="flex-1 rounded-2xl py-3 text-base font-black text-white transition hover:opacity-90 active:scale-[0.98]"
+                style={{ background: "linear-gradient(135deg, #0e7bb5, #5BC8F5)" }}
+              >
+                Continue →
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={submit}
+                disabled={submitting}
+                className="flex-1 rounded-2xl py-3 text-base font-black text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+                style={{ background: "linear-gradient(135deg, #a0622a, #C8955A)" }}
+              >
+                {submitting ? "Submitting…" : "Submit Application 🫶"}
+              </button>
+            )}
+          </div>
+
+          {serverError && (
+            <p className="mt-4 rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-600 font-semibold">
+              {serverError}
+            </p>
+          )}
+        </div>
+      </div>
+    </main>
+  );
+}
