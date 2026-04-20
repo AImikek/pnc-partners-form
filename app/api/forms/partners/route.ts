@@ -1,6 +1,22 @@
 import { NextResponse } from "next/server";
 
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+const AIRTABLE_SPONSOR_TABLE = process.env.AIRTABLE_SPONSOR_TABLE;
+
 export async function POST(req: Request) {
+  if (!AIRTABLE_BASE_ID || !AIRTABLE_TOKEN || !AIRTABLE_SPONSOR_TABLE) {
+    console.error("Missing Airtable env vars:", {
+      AIRTABLE_BASE_ID: !!AIRTABLE_BASE_ID,
+      AIRTABLE_TOKEN: !!AIRTABLE_TOKEN,
+      AIRTABLE_SPONSOR_TABLE: !!AIRTABLE_SPONSOR_TABLE,
+    });
+    return NextResponse.json(
+      { error: "Server misconfiguration: missing Airtable credentials" },
+      { status: 500 }
+    );
+  }
+
   try {
     const data = await req.json();
 
@@ -10,48 +26,53 @@ export async function POST(req: Request) {
       Email: data.email || "",
       Phone: data.phone || "",
       "Company Name": data.organizationName || "",
-      "Role Type": "Sponsor",
+      "Role Type": data.partnerType || "",
       Instagram: data.instagram || "",
       TikTok: data.tiktok || "",
       Website: data.website || "",
       "Referral Source": data.referralSource || "",
       "Uses Whatsapp": data.usesWhatsApp || "",
-      "Business Type": Array.isArray(data.businessType) ? data.businessType : [],
-      Offerings: data.offerings || "",
-      "Total Following": data.totalFollowing || "",
-      "Primary Link": data.primaryLink || "",
-      "Brand Emoji": data.brandEmoji || "",
-      "Marketing Budget": data.marketingBudget || "",
-      "Staff Count": data.staffCount || "",
-      "Logo Assets": data.logoAssets || "",
-      "Content Assets": data.contentAssets || "",
+      "Submitted At": new Date().toISOString(),
     };
 
-    const res = await fetch(
-      `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${encodeURIComponent(
-        process.env.AIRTABLE_SPONSOR_TABLE as string
-      )}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          typecast: true,
-          records: [{ fields }],
-        }),
-      }
-    );
+    if (data.businessType?.length) {
+      fields["Business Type"] = Array.isArray(data.businessType)
+        ? data.businessType
+        : [data.businessType];
+    }
+    if (data.offerings) fields["Offerings"] = data.offerings;
+    if (data.totalFollowing) fields["Total Following"] = data.totalFollowing;
+    if (data.primaryLink) fields["Primary Link"] = data.primaryLink;
+    if (data.brandEmoji) fields["Brand Emoji"] = data.brandEmoji;
+    if (data.marketingBudget) fields["Marketing Budget"] = data.marketingBudget;
+    if (data.staffCount) fields["Staff Count"] = String(data.staffCount);
+    if (data.logoAssets) fields["Logo Assets"] = data.logoAssets;
+    if (data.contentAssets) fields["Content Assets"] = data.contentAssets;
+
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_SPONSOR_TABLE)}`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        typecast: true,
+        records: [{ fields }],
+      }),
+    });
 
     const json = await res.json();
 
     if (!res.ok) {
+      console.error("Airtable error response:", json);
       return NextResponse.json({ error: json }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, airtable: json });
   } catch (error) {
+    console.error("Partner form route error:", error);
     return NextResponse.json(
       { error: "Server error", details: String(error) },
       { status: 500 }
