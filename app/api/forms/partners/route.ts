@@ -38,7 +38,6 @@ export async function POST(req: Request) {
   "Website": data.website || "",
   "Referral Source": data.referralSource || "",
   "Uses Whatsapp": data.usesWhatsApp || "",
-  "Submitted At": new Date().toISOString(),
 };
 
     if (data.businessType?.length) {
