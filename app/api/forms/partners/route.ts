@@ -59,6 +59,74 @@ type Payload = {
 function routePartnerType(partnerType?: PartnerType) {
   switch (partnerType) {
     case "Sponsor / Vendor":
+  return (
+    <>
+      <MultiCheckbox
+        label="Business Type"
+        options={businessTypeOptions}
+        field="businessType"
+        formData={formData}
+        onToggle={handleMultiToggle}
+      />
+
+      <TextArea
+        label="What do you offer?"
+        field="offerings"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Total Following"
+        field="totalFollowing"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Primary Link"
+        field="primaryLink"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Brand Emoji"
+        field="brandEmoji"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <SelectInput
+        label="Marketing Budget"
+        field="marketingBudget"
+        options={marketingBudgetOptions}
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Staff Count"
+        field="staffCount"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Logo Assets"
+        field="logoAssets"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Content Assets"
+        field="contentAssets"
+        formData={formData}
+        onChange={handleChange}
+      />
+    </>
+  );
     case "Venue":
     case "Agency":
     case "Animal Shelter":
