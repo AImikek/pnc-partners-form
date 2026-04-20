@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 
-const LOGO_URL =
-  "https://cdn.shopify.com/s/files/1/0894/0188/4975/files/PupsNChillFullLogoTransparentBG.png";
+const LOGO_URL = "/PupsNChillFullLogoTransparentBG.png";
 
 const ROLE_OPTIONS = [
   { value: "Sponsor / Vendor", emoji: "🤝", label: "Sponsor / Vendor" },
