@@ -52,88 +52,38 @@ export default function Page() {
     organizationName: "",
     partnerType: "",
     businessType: [] as string[],
-    offerings: "",
-    totalFollowing: "",
-    primaryLink: "",
-    brandEmoji: "",
     marketingBudget: "",
-    staffCount: "",
-    logoAssets: "",
-    contentAssets: "",
   });
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleMultiToggle = (field: string, value: string) => {
-    setFormData((prev) => {
-      const current = prev[field as keyof typeof prev] as string[];
-      if (current.includes(value)) {
-        return {
-          ...prev,
-          [field]: current.filter((v) => v !== value),
-        };
-      } else {
-        return {
-          ...prev,
-          [field]: [...current, value],
-        };
-      }
+    setFormData((prev: any) => {
+      const exists = prev[field].includes(value);
+      return {
+        ...prev,
+        [field]: exists
+          ? prev[field].filter((v: string) => v !== value)
+          : [...prev[field], value],
+      };
     });
-  };
-
-  const handleSubmit = async () => {
-    const res = await fetch("/api/forms/partners", {
-      method: "POST",
-      body: JSON.stringify(formData),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert("Error: " + data.error);
-    } else {
-      alert("Success!");
-    }
   };
 
   return (
-    <div style={{ padding: 40, maxWidth: 600 }}>
+    <div style={{ padding: 40 }}>
       <h1>Partner With Pups N Chill</h1>
 
-      <input
-        placeholder="First Name"
-        onChange={(e) => handleChange("firstName", e.target.value)}
-      />
+      <input placeholder="First Name" onChange={(e) => handleChange("firstName", e.target.value)} />
+      <input placeholder="Last Name" onChange={(e) => handleChange("lastName", e.target.value)} />
+      <input placeholder="Email" onChange={(e) => handleChange("email", e.target.value)} />
+      <input placeholder="Phone" onChange={(e) => handleChange("phone", e.target.value)} />
+      <input placeholder="Organization Name" onChange={(e) => handleChange("organizationName", e.target.value)} />
 
-      <input
-        placeholder="Last Name"
-        onChange={(e) => handleChange("lastName", e.target.value)}
-      />
+      <br /><br />
 
-      <input
-        placeholder="Email"
-        onChange={(e) => handleChange("email", e.target.value)}
-      />
-
-      <input
-        placeholder="Phone"
-        onChange={(e) => handleChange("phone", e.target.value)}
-      />
-
-      <input
-        placeholder="Organization Name"
-        onChange={(e) =>
-          handleChange("organizationName", e.target.value)
-        }
-      />
-
-      <select
-        onChange={(e) =>
-          handleChange("partnerType", e.target.value)
-        }
-      >
+      <select onChange={(e) => handleChange("partnerType", e.target.value)}>
         <option>Select Role</option>
         {partnerTypes.map((p) => (
           <option key={p}>{p}</option>
@@ -148,77 +98,21 @@ export default function Page() {
               <input
                 type="checkbox"
                 checked={formData.businessType.includes(opt)}
-                onChange={() =>
-                  handleMultiToggle("businessType", opt)
-                }
+                onChange={() => handleMultiToggle("businessType", opt)}
               />
               {opt}
             </label>
           ))}
 
-          <textarea
-            placeholder="What do you offer?"
-            onChange={(e) =>
-              handleChange("offerings", e.target.value)
-            }
-          />
-
-          <input
-            placeholder="Total Following"
-            onChange={(e) =>
-              handleChange("totalFollowing", e.target.value)
-            }
-          />
-
-          <input
-            placeholder="Primary Link"
-            onChange={(e) =>
-              handleChange("primaryLink", e.target.value)
-            }
-          />
-
-          <input
-            placeholder="Brand Emoji"
-            onChange={(e) =>
-              handleChange("brandEmoji", e.target.value)
-            }
-          />
-
-          <select
-            onChange={(e) =>
-              handleChange("marketingBudget", e.target.value)
-            }
-          >
-            <option>Select Marketing Budget</option>
+          <h3>Marketing Budget</h3>
+          <select onChange={(e) => handleChange("marketingBudget", e.target.value)}>
+            <option>Select Budget</option>
             {marketingBudgetOptions.map((opt) => (
               <option key={opt}>{opt}</option>
             ))}
           </select>
-
-          <input
-            placeholder="Staff Count"
-            onChange={(e) =>
-              handleChange("staffCount", e.target.value)
-            }
-          />
-
-          <input
-            placeholder="Logo Assets (URL)"
-            onChange={(e) =>
-              handleChange("logoAssets", e.target.value)
-            }
-          />
-
-          <input
-            placeholder="Content Assets (URL)"
-            onChange={(e) =>
-              handleChange("contentAssets", e.target.value)
-            }
-          />
         </>
       )}
-
-      <button onClick={handleSubmit}>Submit</button>
     </div>
   );
 }
