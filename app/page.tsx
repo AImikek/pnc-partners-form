@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const LOGO_URL = "/PupsNChillFullLogoTransparentBG.png";
+const LOGO_URL = "/PupsNChillLogoTransparent.png";
 
 const ROLE_OPTIONS = [
   { value: "Sponsor / Vendor", emoji: "🤝", label: "Sponsor / Vendor" },
