@@ -14,7 +14,32 @@ type PartnerType =
   | "Agency"
   | "Animal Shelter"
   | "Other";
+const businessTypeOptions = [
+  "Coffee",
+  "Cold Plunge",
+  "DJ",
+  "Food",
+  "Gym",
+  "IV / Health & Wellness",
+  "Juice",
+  "Massage",
+  "Other",
+  "Paint",
+  "Pilates",
+  "Stretch",
+  "Talent",
+  "Video/Photographer",
+  "Yoga",
+  "pet brand",
+  "Supplements",
+];
 
+const marketingBudgetOptions = [
+  "$0-$500",
+  "$500-$5000",
+  "$5000-$50000",
+  "$50,000+",
+];
 const partnerOptions: PartnerType[] = [
   "Sponsor / Vendor",
   "Venue",
@@ -65,7 +90,7 @@ const initialFormData: FormDataState = {
   website: "",
   referralSource: "",
   usesWhatsApp: "",
-  businessType: "",
+  businessType: [],
   offerings: "",
   totalFollowing: "",
   primaryLink: "",
@@ -120,20 +145,75 @@ export default function Home() {
 
   const conditionalFields = useMemo(() => {
     switch (partnerType) {
-      case "Sponsor / Vendor":
-        return (
-          <>
-            <TextInput label="Business Type" field="businessType" formData={formData} onChange={handleChange} />
-            <TextArea label="What do you offer?" field="offerings" formData={formData} onChange={handleChange} />
-            <TextInput label="Total Following" field="totalFollowing" formData={formData} onChange={handleChange} />
-            <TextInput label="Primary Link" field="primaryLink" formData={formData} onChange={handleChange} />
-            <TextInput label="Brand Emoji" field="brandEmoji" formData={formData} onChange={handleChange} />
-            <TextInput label="Marketing Budget" field="marketingBudget" formData={formData} onChange={handleChange} />
-            <TextInput label="Staff Count" field="staffCount" formData={formData} onChange={handleChange} />
-            <TextInput label="Logo Assets" field="logoAssets" formData={formData} onChange={handleChange} />
-            <TextInput label="Content Assets" field="contentAssets" formData={formData} onChange={handleChange} />
-          </>
-        );
+     case "Sponsor / Vendor":
+  return (
+    <>
+      <MultiCheckbox
+        label="Business Type"
+        options={businessTypeOptions}
+        field="businessType"
+        formData={formData}
+        onToggle={handleMultiToggle}
+      />
+
+      <TextArea
+        label="What do you offer?"
+        field="offerings"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Total Following"
+        field="totalFollowing"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Primary Link"
+        field="primaryLink"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Brand Emoji"
+        field="brandEmoji"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <SelectInput
+        label="Marketing Budget"
+        field="marketingBudget"
+        options={marketingBudgetOptions}
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Staff Count"
+        field="staffCount"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Logo Assets"
+        field="logoAssets"
+        formData={formData}
+        onChange={handleChange}
+      />
+
+      <TextInput
+        label="Content Assets"
+        field="contentAssets"
+        formData={formData}
+        onChange={handleChange}
+      />
+    </>
+  );
       case "Venue":
         return (
           <>
