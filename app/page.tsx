@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const LOGO_URL = "/PupsNChillLogoTransparent.png";
+const LOGO_URL = "/PNCLogo.png";
 
 const ROLE_OPTIONS = [
   { value: "Sponsor / Vendor", emoji: "🤝", label: "Sponsor / Vendor" },
@@ -283,7 +283,7 @@ export default function Page() {
           src={LOGO_URL}
           alt="Pups N Chill"
           className="mx-auto mb-8 object-contain"
-          style={{ height: "140px", width: "auto", mixBlendMode: "multiply" }}
+          style={{ height: "140px", width: "auto" }}
         />
         <div
           className="rounded-3xl px-8 py-10 max-w-md w-full"
@@ -331,7 +331,7 @@ export default function Page() {
           src={LOGO_URL}
           alt="Pups N Chill"
           className="mx-auto object-contain mb-4"
-          style={{ height: "120px", width: "auto", mixBlendMode: "multiply" }}
+          style={{ height: "120px", width: "auto" }}
         />
         <h1
           className="text-3xl font-black text-[#1a2744] sm:text-4xl"
