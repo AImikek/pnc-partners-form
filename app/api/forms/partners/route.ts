@@ -27,19 +27,19 @@ export async function POST(req: Request) {
     });
 
     const fields: Record<string, any> = {
-      "First Name": data.firstName || "",
-      "Last Name": data.lastName || "",
-      Email: data.email || "",
-      Phone Number: data.phone || "",
-      "Company Name": data.organizationName || "",
-      "Role Type": data.partnerType || "",
-      Instagram: data.instagram || "",
-      TikTok: data.tiktok || "",
-      Website: data.website || "",
-      "Referral Source": data.referralSource || "",
-      "Uses Whatsapp": data.usesWhatsApp || "",
-      "Submitted At": new Date().toISOString(),
-    };
+  "First Name": data.firstName || "",
+  "Last Name": data.lastName || "",
+  "Email": data.email || "",
+  "Phone Number": data.phone || "",
+  "Company Name": data.organizationName || "",
+  "Role Type": data.partnerType || "",
+  "Instagram": data.instagram || "",
+  "TikTok": data.tiktok || "",
+  "Website": data.website || "",
+  "Referral Source": data.referralSource || "",
+  "Uses Whatsapp": data.usesWhatsApp || "",
+  "Submitted At": new Date().toISOString(),
+};
 
     if (data.businessType?.length) {
       fields["Business Type"] = Array.isArray(data.businessType)
