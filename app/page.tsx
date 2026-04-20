@@ -206,6 +206,8 @@ export default function Page() {
     });
 
   function scrollTop() {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -233,13 +235,13 @@ export default function Page() {
   function next() {
     if (validateStep(step)) {
       setStep((s) => Math.min(s + 1, STEPS.length));
-      scrollTop();
+      setTimeout(scrollTop, 50);
     }
   }
 
   function back() {
     setStep((s) => Math.max(s - 1, 1));
-    scrollTop();
+    setTimeout(scrollTop, 50);
   }
 
   async function submit() {
@@ -259,7 +261,7 @@ export default function Page() {
         );
       } else {
         setSubmitted(true);
-        scrollTop();
+        setTimeout(scrollTop, 50);
       }
     } catch {
       setServerError("Something went wrong. Please try again.");
@@ -271,7 +273,6 @@ export default function Page() {
   const isSponsor = SPONSOR_ROLES.has(form.partnerType);
   const hasSocial = SOCIAL_ROLES.has(form.partnerType);
 
-  // ── Success screen ──
   if (submitted) {
     return (
       <main
@@ -281,12 +282,13 @@ export default function Page() {
         <img
           src={LOGO_URL}
           alt="Pups N Chill"
-          className="h-28 w-auto mb-8 object-contain"
+          className="mx-auto mb-8 object-contain"
+          style={{ height: "140px", width: "auto", mixBlendMode: "multiply" }}
         />
         <div
           className="rounded-3xl px-8 py-10 max-w-md w-full"
           style={{
-            background: "rgba(255,255,255,0.80)",
+            background: "rgba(255,255,255,0.85)",
             border: "1px solid rgba(91,200,245,0.25)",
             backdropFilter: "blur(16px)",
             boxShadow: "0 8px 40px rgba(14,123,181,0.10)",
@@ -324,12 +326,12 @@ export default function Page() {
       className="min-h-screen"
       style={{ background: "linear-gradient(160deg, #e8f7fd 0%, #f5ede0 100%)" }}
     >
-      {/* Header */}
       <div className="px-6 pt-10 pb-6 text-center">
         <img
           src={LOGO_URL}
           alt="Pups N Chill"
-          className="mx-auto h-24 w-auto object-contain mb-4"
+          className="mx-auto object-contain mb-4"
+          style={{ height: "120px", width: "auto", mixBlendMode: "multiply" }}
         />
         <h1
           className="text-3xl font-black text-[#1a2744] sm:text-4xl"
@@ -342,7 +344,6 @@ export default function Page() {
         </p>
       </div>
 
-      {/* Card */}
       <div className="mx-auto max-w-2xl px-4 pb-16">
         <div
           className="rounded-3xl p-6 sm:p-8"
@@ -355,14 +356,10 @@ export default function Page() {
         >
           <StepIndicator current={step} total={STEPS.length} />
 
-          {/* ── Step 1 ── */}
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <h2
-                  className="mb-1 text-xl font-black text-[#1a2744]"
-                  style={{ fontFamily: "'Nunito', sans-serif" }}
-                >
+                <h2 className="mb-1 text-xl font-black text-[#1a2744]" style={{ fontFamily: "'Nunito', sans-serif" }}>
                   What best describes you?
                 </h2>
                 <p className="text-sm text-[#1a2744]/40 font-semibold">
@@ -380,7 +377,6 @@ export default function Page() {
             </div>
           )}
 
-          {/* ── Step 2 ── */}
           {step === 2 && (
             <div className="space-y-4">
               <div>
@@ -412,7 +408,7 @@ export default function Page() {
                   {errors.email && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.email}</p>}
                 </div>
                 <div>
-                  <Field label="Phone" required>
+                  <Field label="Phone Number" required>
                     <input type="tel" className={inputCls} value={form.phone}
                       onChange={(e) => { set("phone", e.target.value); clearErr("phone"); }} />
                   </Field>
@@ -447,7 +443,6 @@ export default function Page() {
             </div>
           )}
 
-          {/* ── Step 3 ── */}
           {step === 3 && (
             <div className="space-y-4">
               <div>
@@ -495,7 +490,6 @@ export default function Page() {
             </div>
           )}
 
-          {/* ── Step 4 ── */}
           {step === 4 && (
             <div className="space-y-5">
               <div>
@@ -542,7 +536,6 @@ export default function Page() {
             </div>
           )}
 
-          {/* ── Nav ── */}
           <div className="mt-8 flex gap-3">
             {step > 1 && (
               <button type="button" onClick={back}
