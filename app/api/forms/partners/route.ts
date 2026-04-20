@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       "First Name": data.firstName || "",
       "Last Name": data.lastName || "",
       Email: data.email || "",
-      Phone: data.phone || "",
+      Phone Number: data.phone || "",
       "Company Name": data.organizationName || "",
       "Role Type": data.partnerType || "",
       Instagram: data.instagram || "",
