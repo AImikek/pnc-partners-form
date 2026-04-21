@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const LOGO_URL = "/PNCLogo_final.png";
 
@@ -183,6 +183,7 @@ export default function Page() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState("");
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const set = (field: keyof FormData, value: string) =>
     setForm((p) => ({ ...p, [field]: value }));
@@ -205,10 +206,13 @@ export default function Page() {
       return n;
     });
 
-  function scrollTop() {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  function scrollToCard() {
+    setTimeout(() => {
+      if (cardRef.current) {
+        const top = cardRef.current.getBoundingClientRect().top + window.scrollY - 12;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    }, 50);
   }
 
   function validateStep(s: number): boolean {
@@ -235,13 +239,13 @@ export default function Page() {
   function next() {
     if (validateStep(step)) {
       setStep((s) => Math.min(s + 1, STEPS.length));
-      setTimeout(scrollTop, 50);
+      scrollToCard();
     }
   }
 
   function back() {
     setStep((s) => Math.max(s - 1, 1));
-    setTimeout(scrollTop, 50);
+    scrollToCard();
   }
 
   async function submit() {
@@ -261,7 +265,7 @@ export default function Page() {
         );
       } else {
         setSubmitted(true);
-        setTimeout(scrollTop, 50);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch {
       setServerError("Something went wrong. Please try again.");
@@ -282,8 +286,8 @@ export default function Page() {
         <img
           src={LOGO_URL}
           alt="Pups N Chill"
-          className="mx-auto object-contain mb-4"
-          style={{ height: "120px", width: "auto" }}
+          className="mx-auto mb-8 object-contain"
+          style={{ height: "140px", width: "auto" }}
         />
         <div
           className="rounded-3xl px-8 py-10 max-w-md w-full"
@@ -346,6 +350,7 @@ export default function Page() {
 
       <div className="mx-auto max-w-2xl px-4 pb-16">
         <div
+          ref={cardRef}
           className="rounded-3xl p-6 sm:p-8"
           style={{
             background: "rgba(255,255,255,0.72)",
